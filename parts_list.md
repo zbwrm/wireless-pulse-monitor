@@ -1,0 +1,2 @@
+- 1x MAX30102 pulse sensor breakout
+- 2x Raspberry Pi 5
