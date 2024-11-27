@@ -11,6 +11,8 @@ class PGM_GUI:
         self.root.geometry("1280x720")
         self.root.title("PGM Monitor")
 
+        self.loading_canvas = tk.Canvas()
+
         self.background_frame = tk.Frame(self.root)
         self.bpm = tk.IntVar()
         self.ipm = tk.IntVar()
@@ -30,6 +32,32 @@ class PGM_GUI:
     def start_pressed(self):
         self.button_frame.destroy()
         self.begin()
+
+    def loading(self):
+        self.loading_canvas = tk.Canvas(self.root, width=1000, height=660, bg='white')
+        self.loading_canvas.pack(anchor=tk.CENTER, expand=True)
+        data_loading = True
+        load_state = 0
+        canv_height = self.loading_canvas.winfo_height()
+
+        canvas_ID1 = 0
+        canvas_ID2 = 0
+        canvas_ID3 = 0
+        while data_loading:
+            match load_state:
+                case 0:
+                    canvas_ID1 = self.loading_canvas.create_arc((100, 250), (200, canv_height - 250), style=tk.ARC, start=-90,
+                                                   extent=180, width=4)
+                    self.loading_canvas.delete(canvas_ID2)
+                    self.loading_canvas.delete(canvas_ID3)
+                case 1:
+                    canvas_ID2 = self.loading_canvas.create_arc((200, 250), (300, canv_height - 250), style=tk.ARC, start=-90,
+                                                   extent=180, width=4)
+                case 2:
+                    canvas_ID3 = self.loading_canvas.create_arc((300, 250), (400, canv_height - 250), style=tk.ARC, start=-90,
+                                                   extent=180, width=4)
+            load_state = load_state + 1
+            load_state = load_state % 3
 
     def begin(self):
         self.background_frame.columnconfigure(index=0, weight=1)
