@@ -14,8 +14,8 @@ class PGM_GUI:
         self.background_frame = tk.Frame(self.root)
         self.bpm = tk.IntVar()
         self.ipm = tk.IntVar()
-        self.hrstd = tk.DoubleVar()
-        self.rmssd = tk.DoubleVar()
+        self.hrstd = tk.StringVar()
+        self.rmssd = tk.StringVar()
 
         self.button_frame = tk.Frame(self.root)
         #self.button_frame.configure()
@@ -39,10 +39,8 @@ class PGM_GUI:
         self.background_frame.grid_rowconfigure(index=0, weight=1)
         self.background_frame.grid_rowconfigure(index=1, weight=1)
         self.background_frame.grid_rowconfigure(index=2, weight=1)
-        self.bpm.set(0)
-        self.ipm.set(0)
-        self.hrstd.set(0.0)
-        self.rmssd.set(0.0)
+
+        self.reset()
 
         bpm_label = tk.Label(self.background_frame, text="BPM", font=("Comic Sans", 18))
         ipm_label = tk.Label(self.background_frame, text="IPM", font=("Comic Sans", 18))
@@ -53,14 +51,14 @@ class PGM_GUI:
         hrstd_label.grid(row=1, column=2, sticky=tk.W + tk.E)
         rmssd_label.grid(row=1, column=3, sticky=tk.W + tk.E)
 
-        bpm = tk.Label(self.background_frame, textvariable=self.bpm, font=("Gothic", 18))
-        ipm = tk.Label(self.background_frame, textvariable=self.ipm, font=("Gothic", 18))
-        hrstd = tk.Label(self.background_frame, textvariable=self.hrstd, font=("Gothic", 18))
-        rmssd = tk.Label(self.background_frame, textvariable=self.rmssd, font=("Gothic", 18))
-        bpm.grid(row=2, column=0, sticky=tk.W+tk.E)
-        ipm.grid(row=2, column=1, sticky=tk.W + tk.E)
-        hrstd.grid(row=2, column=2, sticky=tk.W + tk.E)
-        rmssd.grid(row=2, column=3, sticky=tk.W + tk.E)
+        bpm_entry = tk.Entry(self.background_frame, textvariable=self.bpm, font=("Gothic", 18))
+        ipm_entry = tk.Entry(self.background_frame, textvariable=self.ipm, font=("Gothic", 18))
+        hrstd_entry = tk.Entry(self.background_frame, textvariable=self.hrstd, font=("Gothic", 18))
+        rmssd_entry = tk.Entry(self.background_frame, textvariable=self.rmssd, font=("Gothic", 18))
+        bpm_entry.grid(row=2, column=0, sticky=tk.W+tk.E)
+        ipm_entry.grid(row=2, column=1, sticky=tk.W + tk.E)
+        hrstd_entry.grid(row=2, column=2, sticky=tk.W + tk.E)
+        rmssd_entry.grid(row=2, column=3, sticky=tk.W + tk.E)
 
         begin_button = tk.Button(self.background_frame, text="Begin Collection", font=('Helvetica', 14), command=self.collect_data)
         end_button = tk.Button(self.background_frame, text="Reset Collection", font=('Helvetica', 14), command=self.reset)
@@ -73,16 +71,27 @@ class PGM_GUI:
         self.background_frame.pack(fill='x')
 
     def collect_data(self):
-        self.bpm.set(randint(60, 210))
-        self.ipm.set(randint(60, 210))
-        self.hrstd.set(random() * randint(0, 100))
-        self.rmssd.set(random() * randint(0, 100))
+        bpm = randint(60, 210)
+        ipm = randint(60, 210)
+        hrstd = random() * randint(0, 100)
+        rmssd = random() * randint(0, 100)
+
+
+        self.bpm.set(bpm)
+        self.ipm.set(ipm)
+        self.hrstd.set('{:.2f}'.format(hrstd))
+        self.rmssd.set('{:.2f}'.format(rmssd))
 
     def reset(self):
-        self.bpm.set(0)
-        self.ipm.set(0)
-        self.hrstd.set(0.0)
-        self.rmssd.set(0.0)
+        bpm = 0
+        ipm = 0
+        hrstd = 0.00
+        rmssd = 0.00
+
+        self.bpm.set(bpm)
+        self.ipm.set(ipm)
+        self.hrstd.set('{:.2f}'.format(hrstd))
+        self.rmssd.set('{:.2f}'.format(rmssd))
 
     def on_closing(self):
         if messagebox.askyesno(title="Quit?", message="Do you really want to quit?"):
