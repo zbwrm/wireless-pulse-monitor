@@ -53,9 +53,9 @@ class MAX30102():
 
         # read & clear interrupt register (read 1 byte)
         reg_data = self.bus.read_i2c_block_data(self.address, REG_INTR_STATUS_1, 1)
-        # print("[SETUP] reset complete with interrupt register0: {0}".format(reg_data))
+        print("[SETUP] reset complete with interrupt register0: {0}".format(reg_data))
         self.setup()
-        # print("[SETUP] setup complete")
+        print("[SETUP] setup complete")
 
     def shutdown(self):
         """
