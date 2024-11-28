@@ -3,6 +3,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from random import randint, random
+from time import time, sleep
 
 class PGM_GUI:
 
@@ -12,6 +13,11 @@ class PGM_GUI:
         self.root.title("PGM Monitor")
 
         self.loading_canvas = tk.Canvas()
+        self.is_loading = False
+        self.load_state = 0
+        self.canvas_ID1 = 0
+        self.canvas_ID2 = 0
+        self.canvas_ID3 = 0
 
         self.background_frame = tk.Frame(self.root)
         self.bpm = tk.IntVar()
@@ -31,33 +37,34 @@ class PGM_GUI:
 
     def start_pressed(self):
         self.button_frame.destroy()
-        self.begin()
-
-    def loading(self):
         self.loading_canvas = tk.Canvas(self.root, width=1000, height=660, bg='white')
         self.loading_canvas.pack(anchor=tk.CENTER, expand=True)
-        data_loading = True
-        load_state = 0
+        self.is_loading = True
+        self.loading()
+
+    def loading(self):
         canv_height = self.loading_canvas.winfo_height()
 
-        canvas_ID1 = 0
-        canvas_ID2 = 0
-        canvas_ID3 = 0
-        while data_loading:
-            match load_state:
+        if self.is_loading:
+            match self.load_state:
                 case 0:
-                    canvas_ID1 = self.loading_canvas.create_arc((100, 250), (200, canv_height - 250), style=tk.ARC, start=-90,
-                                                   extent=180, width=4)
-                    self.loading_canvas.delete(canvas_ID2)
-                    self.loading_canvas.delete(canvas_ID3)
+                    self.canvas_ID1 = self.loading_canvas.create_arc((150, 250), (250, 664 - 250), style=tk.ARC, start=-55,
+                                                   extent=145, width=14, outline="#0000AA")
                 case 1:
-                    canvas_ID2 = self.loading_canvas.create_arc((200, 250), (300, canv_height - 250), style=tk.ARC, start=-90,
-                                                   extent=180, width=4)
+                    self.canvas_ID2 = self.loading_canvas.create_arc((350, 200), (500, 664 - 200), style=tk.ARC, start=-75,
+                                                   extent=165, width=14, outline="#0000AA")
+                    self.loading_canvas.itemconfig(self.canvas_ID1, outline="#BBBBFF")
                 case 2:
-                    canvas_ID3 = self.loading_canvas.create_arc((300, 250), (400, canv_height - 250), style=tk.ARC, start=-90,
-                                                   extent=180, width=4)
-            load_state = load_state + 1
-            load_state = load_state % 3
+                    self.canvas_ID3 = self.loading_canvas.create_arc((550, 150), (750, 664 - 150), style=tk.ARC, start=-90,
+                                                   extent=180, width=14, outline="#0000AA")
+                    self.loading_canvas.itemconfig(self.canvas_ID2, outline="#BBBBFF")
+                case 3:
+                    self.loading_canvas.delete(self.canvas_ID1)
+                    self.loading_canvas.delete(self.canvas_ID2)
+                    self.loading_canvas.delete(self.canvas_ID3)
+            self.load_state = self.load_state + 1
+            self.load_state = self.load_state % 4
+        self.loading_canvas.after(ms=500, func=self.loading)
 
     def begin(self):
         self.background_frame.columnconfigure(index=0, weight=1)
@@ -103,7 +110,6 @@ class PGM_GUI:
         ipm = randint(60, 210)
         hrstd = random() * randint(0, 100)
         rmssd = random() * randint(0, 100)
-
 
         self.bpm.set(bpm)
         self.ipm.set(ipm)
