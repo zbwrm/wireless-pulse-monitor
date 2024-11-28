@@ -1,5 +1,7 @@
 # based on
 # https://github.com/tejas-python/rasberry-pi-max30102/blob/main/max30102.py
+# with additions from
+# https://github.com/sparkfun/Qwiic_MAX3010x_Py/
 
 from time import sleep
 from smbus2 import SMBus
@@ -52,7 +54,7 @@ class MAX30102():
         sleep(1)  # wait 1 sec
 
         # read & clear interrupt register (read 1 byte)
-        reg_data = self.bus.read_i2c_block_data(self.address, REG_INTR_STATUS_1, 1)
+        reg_data = self.bus.read_byte_data(self.address, REG_INTR_STATUS_1)
         print("[SETUP] reset complete with interrupt register0: {0}".format(reg_data))
         self.setup()
         print("[SETUP] setup complete")
@@ -75,9 +77,8 @@ class MAX30102():
         This will setup the device with the values written in sample Arduino code.
         """
         # INTR setting
-        # 0xc0 : A_FULL_EN and PPG_RDY_EN = Interrupt will be triggered when
-        # fifo almost full & new fifo data ready
-        self.bus.write_i2c_block_data(self.address, REG_INTR_ENABLE_1, [0xc0])
+        # 0x20: PPG_RDY_EN = Interrupt will be triggered when new fifo data ready
+        self.bus.write_i2c_block_data(self.address, REG_INTR_ENABLE_1, [0x20])
         self.bus.write_i2c_block_data(self.address, REG_INTR_ENABLE_2, [0x00])
 
         # FIFO_WR_PTR[4:0]
@@ -109,6 +110,12 @@ class MAX30102():
     def set_config(self, reg, value):
         self.bus.write_i2c_block_data(self.address, reg, value)
 
+    def get_read_ptr(self):
+        return self.bus.read_byte_data(self.address, REG_FIFO_RD_PTR, 1)
+
+    def get_write_ptr(self):
+        return self.bus.read_byte_data(self.address, REG_FIFO_WR_PTR, 1)
+
     def read_fifo(self):
         """
         This function will read the data register.
@@ -117,8 +124,8 @@ class MAX30102():
         ir_led = None
 
         # read 1 byte from registers (values are discarded)
-        reg_INTR1 = self.bus.read_i2c_block_data(self.address, REG_INTR_STATUS_1, 1)
-        reg_INTR2 = self.bus.read_i2c_block_data(self.address, REG_INTR_STATUS_2, 1)
+        reg_INTR1 = self.bus.read_byte_data(self.address, REG_INTR_STATUS_1)
+        reg_INTR2 = self.bus.read_byte_data(self.address, REG_INTR_STATUS_2)
 
         # read 6-byte data from the device
         d = self.bus.read_i2c_block_data(self.address, REG_FIFO_DATA, 6)
