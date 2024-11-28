@@ -12,7 +12,7 @@ print(f"Connected to {address}")
 
 try:
     while True:
-        pulse_data = #insert pulse_data
+        pulse_data = b'abcd'
         client_sock.send(pulse_data)
         print(f"Sent: {pulse_data}")
 except Exception as e:
