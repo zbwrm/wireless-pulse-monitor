@@ -180,22 +180,23 @@ class PGM_GUI:
                 # Decode and unpack the received data (example structure)
                 self.decoded_data = self.data.decode("utf-8")
                 self.metrics = self.decoded_data.split(",")
-                hr_avg_data = int(self.metrics[0])
-                hr_std_data = float(self.metrics[1])
-                rmssd_data = float(self.metrics[2])
+                sample_time = float(self.metrics[0])
+                hr_avg = int(self.metrics[1])
+                hr_std = float(self.metrics[2])
+                rmssd = float(self.metrics[3])
 
                 # Update graphing data
                 self.current_time = time() - self.start_time
-                self.timestamps.append(self.current_time)
-                self.hr_averages.append(hr_avg_data)
-                self.hr_stds.append(hr_std_data)
-                self.rmssds.append(rmssd_data)
+                self.timestamps.append(sample_time)
+                self.hr_averages.append(hr_avg)
+                self.hr_stds.append(hr_std)
+                self.rmssds.append(rmssd)
 
                 # Update GUI data
-                self.bpm.set(hr_avg_data)
+                self.bpm.set(hr_avg)
                 self.ipm.set(0)
-                self.hrstd.set('{:.2f}'.format(hr_std_data))
-                self.rmssd.set('{:.2f}'.format(rmssd_data))
+                self.hrstd.set('{:.2f}'.format(hr_std))
+                self.rmssd.set('{:.2f}'.format(rmssd))
 
                 # Limit to the last 100 points
                 if len(self.timestamps) > 100:
