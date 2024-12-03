@@ -39,13 +39,13 @@ try:
                 # Decode and unpack the received data (example structure)
                 decoded_data = data.decode("utf-8")
                 metrics = decoded_data.split(",")
-                hr_avg = int(metrics[0])
-                hr_std = float(metrics[1])
-                rmssd = float(metrics[2])
+                sample_time = float(metrics[0])
+                hr_avg = int(metrics[1])
+                hr_std = float(metrics[2])
+                rmssd = float(metrics[3])
 
                 # Update graphing data
-                current_time = time() - start_time
-                timestamps.append(current_time)
+                timestamps.append(sample_time)
                 hr_averages.append(hr_avg)
                 hr_stds.append(hr_std)
                 rmssds.append(rmssd)
