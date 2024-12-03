@@ -216,7 +216,7 @@ class PGM_GUI:
 
                 self.graphing_canvas.draw()
 
-                self.root.after(1000, self.update_graph)
+                self.root.after(50, self.update_graph)
 
             except Exception as e:
                 print(f"Error processing data: {e}")
