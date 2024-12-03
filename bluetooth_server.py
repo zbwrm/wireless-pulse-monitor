@@ -44,11 +44,12 @@ try:
                 tstamps = np.array(hb_buf)
 
                 intervals = np.diff(tstamps)
-                rmssd = np.sqrt(np.sum(np.square(intervals)))
-                NN50 = np.count_nonzero(intervals > 0.05) # timestamps are in seconds
-                NN20 = np.count_nonzero(intervals > 0.02)
-                pNN50 = NN50 / len(intervals)
-                pNN20 = NN20 / len(intervals)
+                successive_differences = np.diff(intervals)
+                rmssd = np.sqrt(np.sum(np.square(successive_differences)))
+                NN50 = np.count_nonzero(successive_differences > 0.05) # timestamps are in seconds
+                NN20 = np.count_nonzero(successive_differences > 0.02)
+                pNN50 = NN50 / len(successive_differences)
+                pNN20 = NN20 / len(successive_differences)
 
                 rates = np.reciprocal(intervals) * 60
                 hr_avg = np.average(rates)
@@ -56,8 +57,8 @@ try:
 
                 print(hr_avg, hr_std, rmssd)
     
-                # TODO: pack calculated metrics into pulse_data
-                pulse_data = b'abcd'
+                bt_string = f"{int(hr_avg)},{hr_std:.3f},{rmssd:.3f}"
+                pulse_data = bt_string.encode('utf-8')
                 client_sock.send(pulse_data)
                 print(f"Sent: {pulse_data}")
 
