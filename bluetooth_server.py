@@ -7,6 +7,7 @@ from heart_rate import HeartRate
 
 # chosen arbitrarily; 30 heartbeats is under 30s worth of data
 HB_TIMESTAMP_BUFFER_LEN = 30
+IR_BUFFER_LEN = 5
 
 # Set up the Bluetooth server
 server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -28,16 +29,17 @@ sensor.setup(0x03)
 try:
     while True:
         red_val, ir_val = sensor.read_fifo()
+        timestamp = time.time()
         ir_buf.append(ir_val)
 
         ir_avg = 0
         for val in ir_buf:
             ir_avg += val
-        ir_avg / 4
+        ir_avg / IR_BUFFER_LEN
 
         is_hb = heart_rate.checkForBeat(ir_avg)
         if (is_hb):
-            hb_buf.append(time.time())
+            hb_buf.append(timestamp)
             print("beat!", end="  ")
 
             if (len(hb_buf) == HB_TIMESTAMP_BUFFER_LEN):
@@ -55,9 +57,7 @@ try:
                 hr_avg = np.average(rates)
                 hr_std = np.std(rates)
 
-                print(hr_avg, hr_std, rmssd)
-    
-                bt_string = f"{int(hr_avg)},{hr_std:.3f},{rmssd:.3f}"
+                bt_string = f"{timestamp},{int(hr_avg)},{hr_std:.3f},{rmssd:.3f}"
                 pulse_data = bt_string.encode('utf-8')
                 client_sock.send(pulse_data)
                 print(f"Sent: {pulse_data}")
