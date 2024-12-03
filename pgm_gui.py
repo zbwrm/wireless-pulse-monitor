@@ -81,8 +81,6 @@ class PGM_GUI:
     def loading(self):
         canv_height = self.loading_canvas.winfo_height()
         if self.is_loading:
-            if self.loading_loops >= 0:
-                self.is_loading = False
             match self.load_state:
                 case 0:
                     self.canvas_ID1 = self.loading_canvas.create_arc((150, 250), (250, 664 - 250), style=tk.ARC, start=-55,
@@ -120,22 +118,18 @@ class PGM_GUI:
         self.reset()
 
         bpm_label = tk.Label(self.background_frame, text="BPM", font=("Comic Sans", 18))
-        ipm_label = tk.Label(self.background_frame, text="IPM", font=("Comic Sans", 18))
         hrstd_label = tk.Label(self.background_frame, text="HRSTD", font=("Comic Sans", 18))
         rmssd_label = tk.Label(self.background_frame, text="RMSSD", font=("Comic Sans", 18))
         bpm_label.grid(row=1, column=0, sticky=tk.W + tk.E)
-        ipm_label.grid(row=1, column=1, sticky=tk.W + tk.E)
-        hrstd_label.grid(row=1, column=2, sticky=tk.W + tk.E)
-        rmssd_label.grid(row=1, column=3, sticky=tk.W + tk.E)
+        hrstd_label.grid(row=1, column=1, sticky=tk.W + tk.E)
+        rmssd_label.grid(row=1, column=2, sticky=tk.W + tk.E)
 
         bpm_entry = tk.Entry(self.background_frame, textvariable=self.bpm, font=("Gothic", 18))
-        ipm_entry = tk.Entry(self.background_frame, textvariable=self.ipm, font=("Gothic", 18))
         hrstd_entry = tk.Entry(self.background_frame, textvariable=self.hrstd, font=("Gothic", 18))
         rmssd_entry = tk.Entry(self.background_frame, textvariable=self.rmssd, font=("Gothic", 18))
         bpm_entry.grid(row=2, column=0, sticky=tk.W+tk.E)
-        ipm_entry.grid(row=2, column=1, sticky=tk.W + tk.E)
-        hrstd_entry.grid(row=2, column=2, sticky=tk.W + tk.E)
-        rmssd_entry.grid(row=2, column=3, sticky=tk.W + tk.E)
+        hrstd_entry.grid(row=2, column=1, sticky=tk.W + tk.E)
+        rmssd_entry.grid(row=2, column=2, sticky=tk.W + tk.E)
 
         begin_button = tk.Button(self.background_frame, text="Begin Collection", font=('Helvetica', 14), command=self.collect_data)
         end_button = tk.Button(self.background_frame, text="Reset Collection", font=('Helvetica', 14), command=self.reset)
@@ -143,7 +137,7 @@ class PGM_GUI:
 
         begin_button.grid(row=3, column=0, sticky=tk.W + tk.E, pady=40)
         end_button.grid(row=3, column=1, sticky=tk.W + tk.E, pady=40)
-        exit_button.grid(row=3, column=3, sticky=tk.W + tk.E, pady=40)
+        exit_button.grid(row=3, column=2, sticky=tk.W + tk.E, pady=40)
 
         self.background_frame.pack(fill='x')
 
@@ -176,6 +170,7 @@ class PGM_GUI:
     def update_graph(self):
         self.data = self.client_sock.recv(1024)
         if self.data:
+            self.is_loading = False
             try:
                 # Decode and unpack the received data (example structure)
                 self.decoded_data = self.data.decode("utf-8")
@@ -222,15 +217,19 @@ class PGM_GUI:
                 print(f"Error processing data: {e}")
 
     def reset(self):
-        bpm = 0
-        ipm = 0
-        hrstd = 0.00
-        rmssd = 0.00
+        self.timestamps = []
+        self.hr_averages = []  # Heart rate averages
+        self.hr_stds = []  # Heart rate standard deviations
+        self.rmssds = []  # RMSSD (Root Mean Square of Successive Differences)
 
-        self.bpm.set(bpm)
-        self.ipm.set(ipm)
-        self.hrstd.set('{:.2f}'.format(hrstd))
-        self.rmssd.set('{:.2f}'.format(rmssd))
+        # Decode and unpack the received data (example structure)
+        hr_avg_val = int(0)
+        hr_std_val = float(0)
+        rmssd_val = float(0)
+
+        self.bpm.set(hr_avg_val)
+        self.hrstd.set('{:.2f}'.format(hr_std_val))
+        self.rmssd.set('{:.2f}'.format(rmssd_val))
 
     def on_closing(self):
         if messagebox.askyesno(title="Quit?", message="Do you really want to quit?"):
