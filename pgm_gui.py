@@ -109,7 +109,7 @@ class PGM_GUI:
             self.begin()
 
     def begin(self):
-        self.background_frame.config(pady=240)
+        self.background_frame.config(pady=50)
         self.background_frame.columnconfigure(index=0, weight=1)
         self.background_frame.columnconfigure(index=1, weight=1)
         self.background_frame.columnconfigure(index=2, weight=1)
