@@ -39,7 +39,7 @@ try:
                 # Decode and unpack the received data (example structure)
                 decoded_data = data.decode("utf-8")
                 metrics = decoded_data.split(",")
-                hr_avg = float(metrics[0])
+                hr_avg = int(metrics[0])
                 hr_std = float(metrics[1])
                 rmssd = float(metrics[2])
 
