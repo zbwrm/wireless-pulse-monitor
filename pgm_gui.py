@@ -165,7 +165,7 @@ class PGM_GUI:
         self.client_sock.connect((self.server_address, self.port))
         print("Connected to server")
 
-        self.update()
+        self.update_graph()
 
         bpm = randint(60, 210)
         ipm = randint(60, 210)
@@ -177,7 +177,7 @@ class PGM_GUI:
         self.hrstd.set('{:.2f}'.format(hrstd))
         self.rmssd.set('{:.2f}'.format(rmssd))
 
-    def update(self):
+    def update_graph(self):
         self.data = self.client_sock.recv(1024)
         if self.data:
             try:
@@ -213,7 +213,7 @@ class PGM_GUI:
 
                 self.graphing_canvas.draw()
 
-                self.root.after(1000, self.update)
+                self.root.after(1000, self.update_graph)
 
             except Exception as e:
                 print(f"Error processing data: {e}")
