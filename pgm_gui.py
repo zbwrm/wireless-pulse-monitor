@@ -75,8 +75,6 @@ class PGM_GUI:
         self.button_frame.destroy()
         self.loading_canvas = tk.Canvas(self.root, width=1000, height=660, bg='white')
         self.loading_canvas.pack(anchor=tk.CENTER, expand=True)
-        self.is_loading = True
-        self.loading()
 
     def loading(self):
         canv_height = self.loading_canvas.winfo_height()
@@ -106,6 +104,8 @@ class PGM_GUI:
             self.begin()
 
     def begin(self):
+        self.loading()
+        self.is_loading = True
         self.background_frame.config(pady=50)
         self.background_frame.columnconfigure(index=0, weight=1)
         self.background_frame.columnconfigure(index=1, weight=1)
