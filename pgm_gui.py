@@ -157,45 +157,47 @@ class PGM_GUI:
         self.graphing_canvas.get_tk_widget().pack()
 
 
-    def collect_data(self, frame):
-        self.data = self.client_sock.recv(1024)
-        if self.data:
-            try:
-                # Decode and unpack the received data (example structure)
-                self.decoded_data = self.data.decode("utf-8")
-                self.metrics = self.decoded_data.split(",")
-                self.hr_avg = int(self.metrics[0])
-                self.hr_std = float(self.metrics[1])
-                self.rmssd = float(self.metrics[2])
+    def collect_data(self):
 
-                # Update graphing data
-                self.current_time = time() - self.start_time
-                self.timestamps.append(self.current_time)
-                self.hr_averages.append(self.hr_avg)
-                self.hr_stds.append(self.hr_std)
-                self.rmssds.append(self.rmssd)
+        def update(frame):
+            self.data = self.client_sock.recv(1024)
+            if self.data:
+                try:
+                    # Decode and unpack the received data (example structure)
+                    self.decoded_data = self.data.decode("utf-8")
+                    self.metrics = self.decoded_data.split(",")
+                    self.hr_avg = int(self.metrics[0])
+                    self.hr_std = float(self.metrics[1])
+                    self.rmssd = float(self.metrics[2])
 
-                # Limit to the last 100 points
-                if len(self.timestamps) > 100:
-                    self.timestamps.pop(0)
-                    self.hr_averages.pop(0)
-                    self.hr_stds.pop(0)
-                    self.rmssds.pop(0)
+                    # Update graphing data
+                    self.current_time = time() - self.start_time
+                    self.timestamps.append(self.current_time)
+                    self.hr_averages.append(self.hr_avg)
+                    self.hr_stds.append(self.hr_std)
+                    self.rmssds.append(self.rmssd)
 
-                # Update the lines
-                self.line_hr_avg.set_data(self.timestamps, self.hr_averages)
-                self.line_hr_std.set_data(self.timestamps, self.hr_stds)
-                self.line_rmssd.set_data(self.timestamps, self.rmssds)
+                    # Limit to the last 100 points
+                    if len(self.timestamps) > 100:
+                        self.timestamps.pop(0)
+                        self.hr_averages.pop(0)
+                        self.hr_stds.pop(0)
+                        self.rmssds.pop(0)
 
-                # Adjust the axes
-                self.ax.relim()
-                self.ax.autoscale_view()
+                    # Update the lines
+                    self.line_hr_avg.set_data(self.timestamps, self.hr_averages)
+                    self.line_hr_std.set_data(self.timestamps, self.hr_stds)
+                    self.line_rmssd.set_data(self.timestamps, self.rmssds)
 
-            except Exception as e:
-                print(f"Error processing data: {e}")
+                    # Adjust the axes
+                    self.ax.relim()
+                    self.ax.autoscale_view()
 
-            # Set up the animation
-            self.ani = FuncAnimation(self.fig, self.collect_data, interval=100)  # Update every 100ms
+                except Exception as e:
+                    print(f"Error processing data: {e}")
+
+        # Set up the animation
+        self.ani = FuncAnimation(self.fig, update, interval=100)  # Update every 100ms
 
         bpm = randint(60, 210)
         ipm = randint(60, 210)
@@ -206,6 +208,7 @@ class PGM_GUI:
         self.ipm.set(ipm)
         self.hrstd.set('{:.2f}'.format(hrstd))
         self.rmssd.set('{:.2f}'.format(rmssd))
+
 
     def reset(self):
         bpm = 0
