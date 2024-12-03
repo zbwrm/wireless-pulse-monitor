@@ -3,7 +3,16 @@
 import tkinter as tk
 from tkinter import messagebox
 from random import randint, random
+import bluetooth
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
+NavigationToolbar2Tk)
+from matplotlib.animation import FuncAnimation
 from time import time, sleep
+
+from bluetooth_client import update
+
 
 class PGM_GUI:
 
@@ -14,6 +23,7 @@ class PGM_GUI:
 
         self.loading_canvas = tk.Canvas()
         self.is_loading = False
+        self.loading_loops = 0
         self.load_state = 0
         self.canvas_ID1 = 0
         self.canvas_ID2 = 0
@@ -25,11 +35,41 @@ class PGM_GUI:
         self.hrstd = tk.StringVar()
         self.rmssd = tk.StringVar()
 
-        self.button_frame = tk.Frame(self.root)
+        self.button_frame = tk.Frame(self.root, pady= 250)
         #self.button_frame.configure()
         self.start_button = tk.Button(self.button_frame, text="Start", font=('Comic Sans', 18), command=self.start_pressed)
         self.start_button.pack()
 
+        #   =====   Bluetooth   =====
+        self.server_address = "2C:CF:67:03:0B:77"
+        self.port = 1
+
+        self.client_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        self.data = 0
+        self.decoded_data = 0
+        self.metrics = 0
+        #   =====   END Bluetooth   =====
+
+        #   =====   Graphing    =====
+        # Data storage for graphing
+        self.timestamps = []
+        self.hr_averages = []  # Heart rate averages
+        self.hr_stds = []  # Heart rate standard deviations
+        self.rmssds = []  # RMSSD (Root Mean Square of Successive Differences)
+
+        # Start the Matplotlib figure
+        self.fig, self.ax = plt.subplots()
+        self.ax.set_title("Heart Rate Metrics Over Time")
+        self.ax.set_xlabel("Time (s)")
+        self.ax.set_ylabel("Metrics")
+        self.line_hr_avg, = self.ax.plot([], [], label="HR Avg (bpm)", color="red")
+        self.line_hr_std, = self.ax.plot([], [], label="HR Std (bpm)", color="blue")
+        self.line_rmssd, = self.ax.plot([], [], label="RMSSD", color="green")
+        self.ax.legend()
+
+        self.start_time = time()
+
+        #   =====   END Graphing    =====
         self.button_frame.pack(fill='both')
 
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -44,8 +84,9 @@ class PGM_GUI:
 
     def loading(self):
         canv_height = self.loading_canvas.winfo_height()
-
         if self.is_loading:
+            if self.loading_loops >= 0:
+                self.is_loading = False
             match self.load_state:
                 case 0:
                     self.canvas_ID1 = self.loading_canvas.create_arc((150, 250), (250, 664 - 250), style=tk.ARC, start=-55,
@@ -59,14 +100,19 @@ class PGM_GUI:
                                                    extent=180, width=14, outline="#0000AA")
                     self.loading_canvas.itemconfig(self.canvas_ID2, outline="#BBBBFF")
                 case 3:
+                    self.loading_loops = self.loading_loops + 1
                     self.loading_canvas.delete(self.canvas_ID1)
                     self.loading_canvas.delete(self.canvas_ID2)
                     self.loading_canvas.delete(self.canvas_ID3)
             self.load_state = self.load_state + 1
             self.load_state = self.load_state % 4
-        self.loading_canvas.after(ms=500, func=self.loading)
+            self.loading_canvas.after(ms=500, func=self.loading)
+        else:
+            self.loading_canvas.destroy()
+            self.begin()
 
     def begin(self):
+        self.background_frame.config(pady=50)
         self.background_frame.columnconfigure(index=0, weight=1)
         self.background_frame.columnconfigure(index=1, weight=1)
         self.background_frame.columnconfigure(index=2, weight=1)
@@ -81,7 +127,7 @@ class PGM_GUI:
         ipm_label = tk.Label(self.background_frame, text="IPM", font=("Comic Sans", 18))
         hrstd_label = tk.Label(self.background_frame, text="HRSTD", font=("Comic Sans", 18))
         rmssd_label = tk.Label(self.background_frame, text="RMSSD", font=("Comic Sans", 18))
-        bpm_label.grid(row=1, column=0, sticky=tk.W+tk.E)
+        bpm_label.grid(row=1, column=0, sticky=tk.W + tk.E)
         ipm_label.grid(row=1, column=1, sticky=tk.W + tk.E)
         hrstd_label.grid(row=1, column=2, sticky=tk.W + tk.E)
         rmssd_label.grid(row=1, column=3, sticky=tk.W + tk.E)
@@ -105,7 +151,22 @@ class PGM_GUI:
 
         self.background_frame.pack(fill='x')
 
+        # creating the Tkinter canvas
+        # containing the Matplotlib figure
+        self.graphing_canvas = FigureCanvasTkAgg(self.fig, master=self.root)
+        self.graphing_canvas.draw()
+
+        # placing the canvas on the Tkinter window
+        self.graphing_canvas.get_tk_widget().pack()
+
+
     def collect_data(self):
+        # Connect to the server
+        self.client_sock.connect((self.server_address, self.port))
+        print("Connected to server")
+
+        self.update()
+
         bpm = randint(60, 210)
         ipm = randint(60, 210)
         hrstd = random() * randint(0, 100)
@@ -115,6 +176,48 @@ class PGM_GUI:
         self.ipm.set(ipm)
         self.hrstd.set('{:.2f}'.format(hrstd))
         self.rmssd.set('{:.2f}'.format(rmssd))
+
+    def update(self):
+        self.data = self.client_sock.recv(1024)
+        if self.data:
+            try:
+                # Decode and unpack the received data (example structure)
+                self.decoded_data = self.data.decode("utf-8")
+                self.metrics = self.decoded_data.split(",")
+                self.hr_avg = int(self.metrics[0])
+                self.hr_std = float(self.metrics[1])
+                self.rmssd = float(self.metrics[2])
+
+                # Update graphing data
+                self.current_time = time() - self.start_time
+                self.timestamps.append(self.current_time)
+                self.hr_averages.append(self.hr_avg)
+                self.hr_stds.append(self.hr_std)
+                self.rmssds.append(self.rmssd)
+
+                # Limit to the last 100 points
+                if len(self.timestamps) > 100:
+                    self.timestamps.pop(0)
+                    self.hr_averages.pop(0)
+                    self.hr_stds.pop(0)
+                    self.rmssds.pop(0)
+
+                # Update the lines
+                self.line_hr_avg.set_data(self.timestamps, self.hr_averages)
+                self.line_hr_std.set_data(self.timestamps, self.hr_stds)
+                self.line_rmssd.set_data(self.timestamps, self.rmssds)
+
+                # Adjust the axes
+                self.ax.relim()
+                self.ax.autoscale_view()
+
+                self.graphing_canvas.draw()
+
+                self.root.after(1000, self.update)
+
+            except Exception as e:
+                print(f"Error processing data: {e}")
+
 
     def reset(self):
         bpm = 0
