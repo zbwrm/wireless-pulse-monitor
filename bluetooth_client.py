@@ -1,6 +1,6 @@
 # bluetooth_client
+serverAddress = "2C:CF:67:03:0B:77"  #Pi 1's MAC
 import bluetooth
-serverAddress = 2C:CF:67:03:0B:77"  #Pi 1's MAC
 port = 1
 
 client_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
