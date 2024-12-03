@@ -66,14 +66,6 @@ class PGM_GUI:
 
         self.start_time = time()
 
-        # creating the Tkinter canvas
-        # containing the Matplotlib figure
-        self.graphing_canvas = FigureCanvasTkAgg(self.fig, master=self.root)
-        self.graphing_canvas.draw()
-
-        # placing the canvas on the Tkinter window
-        self.graphing_canvas.get_tk_widget().pack()
-
         #   =====   END Graphing    =====
         self.button_frame.pack(fill='both')
 
@@ -155,6 +147,15 @@ class PGM_GUI:
         exit_button.grid(row=3, column=3, sticky=tk.W + tk.E, pady=40)
 
         self.background_frame.pack(fill='x')
+
+        # creating the Tkinter canvas
+        # containing the Matplotlib figure
+        self.graphing_canvas = FigureCanvasTkAgg(self.fig, master=self.root)
+        self.graphing_canvas.draw()
+
+        # placing the canvas on the Tkinter window
+        self.graphing_canvas.get_tk_widget().pack()
+
 
     def collect_data(self, frame):
         self.data = self.client_sock.recv(1024)
