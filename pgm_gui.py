@@ -196,6 +196,8 @@ class PGM_GUI:
                     self.ax.relim()
                     self.ax.autoscale_view()
 
+                    self.graphing_canvas.draw()
+
                 except Exception as e:
                     print(f"Error processing data: {e}")
 
