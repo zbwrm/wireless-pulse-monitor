@@ -158,6 +158,9 @@ class PGM_GUI:
 
 
     def collect_data(self):
+        # Connect to the server
+        self.client_sock.connect((self.server_address, self.port))
+        print("Connected to server")
 
         def update(frame):
             self.data = self.client_sock.recv(1024)
