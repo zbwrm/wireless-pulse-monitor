@@ -7,7 +7,7 @@ from heart_rate import HeartRate
 
 # chosen arbitrarily; 30 heartbeats is under 30s worth of data
 HB_TIMESTAMP_BUFFER_LEN = 30
-IR_BUFFER_LEN = 5
+IR_BUFFER_LEN = 10
 
 # Set up the Bluetooth server
 server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -66,7 +66,7 @@ try:
                 print(f"not enough data! need {HB_TIMESTAMP_BUFFER_LEN - len(hb_buf)} more beats")
         
         # maybe remove/adjust this -- needs testing
-        time.sleep(0.025)
+        time.sleep(0.015)
 except Exception as e:
     print(f"Error: {e}")
 finally:
