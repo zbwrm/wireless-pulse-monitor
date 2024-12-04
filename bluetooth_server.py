@@ -20,7 +20,7 @@ print(f"Connected to {address}")
 
 heart_rate = HeartRate()
 
-ir_buf = deque(maxlen=4)
+ir_buf = deque(maxlen=IR_BUFFER_LEN)
 hb_buf = deque(maxlen=HB_TIMESTAMP_BUFFER_LEN)
 
 sensor = max30102.MAX30102()
