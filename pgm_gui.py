@@ -117,7 +117,6 @@ class PGM_GUI:
         self.background_frame.columnconfigure(index=0, weight=1)
         self.background_frame.columnconfigure(index=1, weight=1)
         self.background_frame.columnconfigure(index=2, weight=1)
-        self.background_frame.columnconfigure(index=3, weight=1)
         self.background_frame.grid_rowconfigure(index=0, weight=1)
         self.background_frame.grid_rowconfigure(index=1, weight=1)
         self.background_frame.grid_rowconfigure(index=2, weight=1)
