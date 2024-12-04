@@ -73,13 +73,17 @@ class PGM_GUI:
 
     def start_pressed(self):
         self.button_frame.destroy()
-        self.begin()
+        self.loading_canvas = tk.Canvas(self.root, width=1000, height=660, bg='white')
+        self.loading_canvas.pack(anchor=tk.CENTER, expand=True)
+        self.is_loading = True
+
+        self.loading()
+
 
     def loading(self):
         canv_height = self.loading_canvas.winfo_height()
-        if self.loading_loops < 1:
-            self.update_graph()
-
+        if self.loading_loops >= 3:
+            self.is_loading = False
         if self.is_loading:
             match self.load_state:
                 case 0:
@@ -103,6 +107,7 @@ class PGM_GUI:
             self.loading_canvas.after(ms=500, func=self.loading)
         else:
             self.loading_canvas.destroy()
+            self.begin()
         self.loading_loops = self.loading_loops + 1
 
 
@@ -156,12 +161,6 @@ class PGM_GUI:
         # Connect to the server
         self.client_sock.connect((self.server_address, self.port))
         print("Connected to server")
-
-        self.loading_canvas = tk.Canvas(self.root, width=1000, height=660, bg='white')
-        self.loading_canvas.pack(anchor=tk.CENTER, expand=True)
-        self.is_loading = True
-
-        self.loading()
 
         bpm = randint(60, 210)
         hrstd = random() * randint(0, 100)
