@@ -162,6 +162,8 @@ class PGM_GUI:
         self.client_sock.connect((self.server_address, self.port))
         print("Connected to server")
 
+        self.update_graph()
+
         bpm = randint(60, 210)
         hrstd = random() * randint(0, 100)
         rmssd = random() * randint(0, 100)
