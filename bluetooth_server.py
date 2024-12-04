@@ -66,7 +66,7 @@ try:
                 print(f"not enough data! need {HB_TIMESTAMP_BUFFER_LEN - len(hb_buf)} more beats")
         
         # maybe remove/adjust this -- needs testing
-        time.sleep(0.015)
+        time.sleep(0.02)
 except Exception as e:
     print(f"Error: {e}")
 finally:
