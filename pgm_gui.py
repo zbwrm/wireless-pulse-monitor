@@ -153,7 +153,6 @@ class PGM_GUI:
         # placing the canvas on the Tkinter window
         self.graphing_canvas.get_tk_widget().pack()
 
-
     def collect_data(self):
         # Connect to the server
         self.client_sock.connect((self.server_address, self.port))
