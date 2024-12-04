@@ -230,6 +230,12 @@ class PGM_GUI:
         hr_std_val = float(0)
         rmssd_val = float(0)
 
+        # Adjust the axes
+        self.ax.relim()
+        self.ax.autoscale_view()
+
+        self.graphing_canvas.draw()
+
         self.bpm.set(hr_avg_val)
         self.hrstd.set('{:.2f}'.format(hr_std_val))
         self.rmssd.set('{:.2f}'.format(rmssd_val))
