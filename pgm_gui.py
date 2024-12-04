@@ -121,8 +121,6 @@ class PGM_GUI:
         self.background_frame.grid_rowconfigure(index=1, weight=1)
         self.background_frame.grid_rowconfigure(index=2, weight=1)
 
-        self.reset()
-
         bpm_label = tk.Label(self.background_frame, text="BPM", font=("Comic Sans", 18))
         hrstd_label = tk.Label(self.background_frame, text="HRSTD", font=("Comic Sans", 18))
         rmssd_label = tk.Label(self.background_frame, text="RMSSD", font=("Comic Sans", 18))
@@ -154,7 +152,6 @@ class PGM_GUI:
 
         # placing the canvas on the Tkinter window
         self.graphing_canvas.get_tk_widget().pack()
-
 
     def collect_data(self):
         # Connect to the server
@@ -229,6 +226,12 @@ class PGM_GUI:
         hr_avg_val = int(0)
         hr_std_val = float(0)
         rmssd_val = float(0)
+
+        # Adjust the axes
+        self.ax.relim()
+        self.ax.autoscale_view()
+
+        self.graphing_canvas.draw()
 
         self.bpm.set(hr_avg_val)
         self.hrstd.set('{:.2f}'.format(hr_std_val))
