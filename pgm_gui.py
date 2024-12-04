@@ -121,8 +121,6 @@ class PGM_GUI:
         self.background_frame.grid_rowconfigure(index=1, weight=1)
         self.background_frame.grid_rowconfigure(index=2, weight=1)
 
-        self.reset()
-
         bpm_label = tk.Label(self.background_frame, text="BPM", font=("Comic Sans", 18))
         hrstd_label = tk.Label(self.background_frame, text="HRSTD", font=("Comic Sans", 18))
         rmssd_label = tk.Label(self.background_frame, text="RMSSD", font=("Comic Sans", 18))
