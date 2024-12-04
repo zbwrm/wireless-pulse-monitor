@@ -75,9 +75,15 @@ class PGM_GUI:
         self.button_frame.destroy()
         self.loading_canvas = tk.Canvas(self.root, width=1000, height=660, bg='white')
         self.loading_canvas.pack(anchor=tk.CENTER, expand=True)
+        self.is_loading = True
+
+        self.loading()
+
 
     def loading(self):
         canv_height = self.loading_canvas.winfo_height()
+        if self.loading_loops >= 3:
+            self.is_loading = False
         if self.is_loading:
             match self.load_state:
                 case 0:
@@ -102,10 +108,11 @@ class PGM_GUI:
         else:
             self.loading_canvas.destroy()
             self.begin()
+        self.loading_loops = self.loading_loops + 1
+
 
     def begin(self):
-        self.loading()
-        self.is_loading = True
+
         self.background_frame.config(pady=50)
         self.background_frame.columnconfigure(index=0, weight=1)
         self.background_frame.columnconfigure(index=1, weight=1)
@@ -158,12 +165,10 @@ class PGM_GUI:
         self.update_graph()
 
         bpm = randint(60, 210)
-        ipm = randint(60, 210)
         hrstd = random() * randint(0, 100)
         rmssd = random() * randint(0, 100)
 
         self.bpm.set(bpm)
-        self.ipm.set(ipm)
         self.hrstd.set('{:.2f}'.format(hrstd))
         self.rmssd.set('{:.2f}'.format(rmssd))
 
@@ -189,7 +194,6 @@ class PGM_GUI:
 
                 # Update GUI data
                 self.bpm.set(hr_avg)
-                self.ipm.set(0)
                 self.hrstd.set('{:.2f}'.format(hr_std))
                 self.rmssd.set('{:.2f}'.format(rmssd))
 
