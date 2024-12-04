@@ -145,7 +145,7 @@ class HeartRate(object):
             self.negativeEdge = 0
             self.IR_AC_Signal_max = 0
 
-            if ((self.IR_AC_Max - self.IR_AC_Min) > 100 & (self.IR_AC_Max - self.IR_AC_Min) < 1000):
+            if ((self.IR_AC_Max - self.IR_AC_Min) > 20 & (self.IR_AC_Max - self.IR_AC_Min) < 1000):
                 #Heart beat!!!
                 beatDetected = True
 
